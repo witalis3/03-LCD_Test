@@ -1,2 +1,0 @@
-# 03-LCD_Test
-test ST7735 with STM32H743VIT6
