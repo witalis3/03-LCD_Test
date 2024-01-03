@@ -27,19 +27,24 @@
   * PC2_C MISO niebieski
   * PC1 MOSI fioletowy
   *     CS żółty
+  * urok_1
+  * LED zamiast na PC13 jest na PE3 (na schemacie dioda oznaczona jako E3 BLUE_LED)
   *
   */
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
+#include "fatfs.h"
 #include "rtc.h"
 #include "spi.h"
 #include "tim.h"
+#include "usart.h"
 #include "gpio.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include "lcd.h"
+#include "sd.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -60,7 +65,7 @@
 /* Private variables ---------------------------------------------------------*/
 
 /* USER CODE BEGIN PV */
-
+volatile uint16_t Timer1=0;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -180,10 +185,16 @@ CPU_CACHE_Enable();
   MX_SPI4_Init();
   MX_TIM1_Init();
   MX_SPI2_Init();
+  MX_TIM2_Init();
+  MX_USART1_UART_Init();
+  MX_FATFS_Init();
   /* USER CODE BEGIN 2 */
   //	HAL_TIMEx_PWMN_Start(&htim1,TIM_CHANNEL_2);
   //	__HAL_TIM_SetCompare(&htim1,TIM_CHANNEL_2,10);
   	LCD_Test();
+  	HAL_TIM_Base_Start_IT(&htim2);
+  	SD_PowerOn();
+  	sd_ini();
 
   /* USER CODE END 2 */
 
@@ -263,7 +274,13 @@ void SystemClock_Config(void)
 }
 
 /* USER CODE BEGIN 4 */
-
+void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
+{
+	if(htim==&htim2)
+	{
+		Timer1++;
+	}
+}
 /* USER CODE END 4 */
 
 /**
