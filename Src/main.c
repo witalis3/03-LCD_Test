@@ -14,6 +14,20 @@
   * If no LICENSE file comes with this software, it is provided AS-IS.
   *
   ******************************************************************************
+  *
+  * ToDo
+  * SPI4 interfejs do LCD
+  * PE12 SCK zielony
+  * PE14 MOSI fioletowy
+  * OLED CS: PE10 LCD_CS żółty nie jest to CS dla SPI!
+  * Half Duplex -> tylko MOSI
+  * -----------
+  * SPI2 - nowy interfejs do testowania z kartą SD (uroks)
+  * PB10 SCK zielony
+  * PC2_C MISO niebieski
+  * PC1 MOSI fioletowy
+  *     CS żółty
+  *
   */
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
@@ -165,6 +179,7 @@ CPU_CACHE_Enable();
   MX_RTC_Init();
   MX_SPI4_Init();
   MX_TIM1_Init();
+  MX_SPI2_Init();
   /* USER CODE BEGIN 2 */
   //	HAL_TIMEx_PWMN_Start(&htim1,TIM_CHANNEL_2);
   //	__HAL_TIM_SetCompare(&htim1,TIM_CHANNEL_2,10);
