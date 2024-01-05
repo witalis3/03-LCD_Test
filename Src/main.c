@@ -26,7 +26,7 @@
   * PB10 SCK zielony
   * PC2_C MISO niebieski
   * PC1 MOSI fioletowy
-  *     CS żółty
+  * PA3 CS żółty (CS_SD)
   * urok_1
   * LED zamiast na PC13 jest na PE3 (na schemacie dioda oznaczona jako E3 BLUE_LED)
   *
