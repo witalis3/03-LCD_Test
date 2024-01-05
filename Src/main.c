@@ -22,12 +22,12 @@
   * OLED CS: PE10 LCD_CS żółty nie jest to CS dla SPI!
   * Half Duplex -> tylko MOSI
   * -----------
-  * SPI2 - nowy interfejs do testowania z kartą SD (uroks)
-  * PB10 SCK zielony
-  * PC2_C MISO niebieski
-  * PC1 MOSI fioletowy
-  * PA3 CS żółty (CS_SD)
-  * urok_1
+  * SPI2 - nowy interfejs do testowania z kartą SD (urok 88 - part 2)
+  * podłączona karta SD na barana (mini stykówka z goldpinów):
+  * PB10 SCK zielony -> PC12
+  * PC2_C MISO niebieski -> PC8
+  * PC1 MOSI fioletowy -> PD2
+  * PC11 CS żółty (CS_SD) niepotrzebna stykówka
   * LED zamiast na PC13 jest na PE3 (na schemacie dioda oznaczona jako E3 BLUE_LED)
   *
   */
