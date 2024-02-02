@@ -57,6 +57,7 @@ uint8_t sd_ini(void)
 				for (i = 0; i < 4; i++) ocr[i] = SPI_ReceiveByte();
 				sprintf(str1,"OCR: 0x%02X 0x%02X 0x%02X 0x%02X\r\n",ocr[0],ocr[1],ocr[2],ocr[3]);
 				HAL_UART_Transmit(&huart1,(uint8_t*)str1,strlen(str1),0x1000);
+				// Get trailing return value of R7 resp
 				if (ocr[2] == 0x01 && ocr[3] == 0xAA) // The card can work at vdd range of 2.7-3.6V
 				{
 					for (tmr = 12000; tmr && SD_cmd(ACMD41, 1UL << 30); tmr--); // Wait for leaving idle state (ACMD41 with HCS bit)
@@ -85,6 +86,8 @@ uint8_t sd_ini(void)
 	    }
 	    else
 	    {
+	    	sprintf(str1,"Type SD: unknown");
+	    	HAL_UART_Transmit(&huart1,(uint8_t*)str1,strlen(str1),0x1000);
 	      return 1;
 	    }
 		sprintf(str1,"Type SD: 0x%02X\r\n",sdinfo.type);

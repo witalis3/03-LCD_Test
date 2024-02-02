@@ -16,19 +16,25 @@
   ******************************************************************************
   *
   * ToDo
+  * ---------------- jest:
   * SPI4 interfejs do LCD
   * PE12 SCK zielony
   * PE14 MOSI fioletowy
   * OLED CS: PE10 LCD_CS żółty nie jest to CS dla SPI!
   * Half Duplex -> tylko MOSI
   * -----------
+  * RS232 na USART1
+  * PB14 TxD
+  * PB15 RxD
+  * ----------------------------------
   * SPI2 - nowy interfejs do testowania z kartą SD (urok 88 - part 2)
-  * podłączona karta SD na barana (mini stykówka z goldpinów):
-  * PB10 SCK zielony -> PC12
-  * PC2_C MISO niebieski -> PC8
-  * PC1 MOSI fioletowy -> PD2
-  * PC11 CS żółty (CS_SD) niepotrzebna stykówka
-  * LED zamiast na PC13 jest na PE3 (na schemacie dioda oznaczona jako E3 BLUE_LED)
+  * podłączona karta SD z modułu na barana (mini stykówka z goldpinów):
+  * SPI2 ------------------> gniazdo SD
+  * PB10  SCK zielony     -> PC12
+  * PC2_C MISO niebieski  -> PC8
+  * PC1   MOSI fioletowy  -> PD2
+  * PC11  CS żółty (CS_SD) niepotrzebna stykówka
+  * LED zamiast na PC13 jest na PE3 (na schemacie modułu dioda oznaczona jako E3 BLUE_LED)
   *
   */
 /* USER CODE END Header */
@@ -71,7 +77,6 @@ volatile uint16_t Timer1=0;
 /* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
 /* USER CODE BEGIN PFP */
-
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
@@ -192,6 +197,8 @@ CPU_CACHE_Enable();
   //	HAL_TIMEx_PWMN_Start(&htim1,TIM_CHANNEL_2);
   //	__HAL_TIM_SetCompare(&htim1,TIM_CHANNEL_2,10);
   	LCD_Test();
+  	char str1[] = "hello urok 88";
+  	HAL_UART_Transmit(&huart1,(uint8_t*)str1,strlen(str1),0x1000);
   	HAL_TIM_Base_Start_IT(&htim2);
   	SD_PowerOn();
   	sd_ini();
