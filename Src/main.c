@@ -77,6 +77,16 @@
 /* USER CODE BEGIN PV */
 volatile uint16_t Timer1 = 0;
 uint8_t sect[512];
+extern char str1[60];
+uint32_t byteswritten,bytesread;
+uint8_t result;
+extern char USER_Path[4]; /* logical drive path */
+FATFS SDFatFs;
+FATFS *fs;
+FIL MyFile;
+FRESULT fr;
+FILINFO fno;
+
 //char buffer1[512] ="Selection ... The..."; //Буфер данных для записи/чтения -> tylko do testu
 /* USER CODE END PV */
 
@@ -87,6 +97,38 @@ void SystemClock_Config(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
+FRESULT ReadLongFile(void)
+{
+  uint16_t i=0, i1=0;
+  uint32_t ind=0;
+  uint32_t f_size = fno.fsize;
+	sprintf(str1, "fsize: %lu\r\n", (unsigned long) f_size);
+	HAL_UART_Transmit(&huart1, (uint8_t*) str1, strlen(str1), 0x1000);
+	ind = 0;
+	do
+	{
+		if (f_size < 512)
+		{
+			i1 = f_size;
+		}
+		else
+		{
+			i1 = 512;
+		}
+		f_size -= i1;
+		f_lseek(&MyFile, ind);
+		f_read(&MyFile, sect, i1, (UINT*) &bytesread);
+		for (i = 0; i < bytesread; i++)
+		{
+			HAL_UART_Transmit(&huart1, sect + i, 1, 0x1000);
+		}
+		ind += i1;
+	}
+	while (f_size > 0);
+	HAL_UART_Transmit(&huart1, (uint8_t*) "\r\n", 2, 0x1000);
+	return FR_OK;
+}
+
 static void MPU_Config(void)
 {
   MPU_Region_InitTypeDef MPU_InitStruct = {0};
@@ -166,6 +208,8 @@ static void RTC_CalendarShow(RTC_DateTypeDef *sdatestructureget,RTC_TimeTypeDef 
 int main(void)
 {
   /* USER CODE BEGIN 1 */
+	uint16_t i;
+
 #ifdef W25Qxx
   SCB->VTOR = QSPI_BASE;
 #endif
@@ -206,8 +250,28 @@ CPU_CACHE_Enable();
   	char str1[] = "hello urok 88\r\n";
   	HAL_UART_Transmit(&huart1,(uint8_t*)str1,strlen(str1),0x1000);
   	HAL_TIM_Base_Start_IT(&htim2);
-  	SD_PowerOn();
-  	sd_ini();
+
+  	disk_initialize(SDFatFs.drv);
+	if (f_mount(&SDFatFs, (TCHAR const*) USERPath, 0) != FR_OK)
+	{
+		Error_Handler();
+	}
+	else
+	{
+		fr = f_stat("123.txt", &fno);
+		if (f_open(&MyFile, "123.txt", FA_READ) != FR_OK)
+		{
+			Error_Handler();
+		}
+		else
+		{
+			ReadLongFile();
+			f_close(&MyFile);
+		}
+	}
+
+  	//SD_PowerOn();
+  	//sd_ini();
   	// test zapisu i odczytu z SD:
   	//SD_Write_Block((uint8_t*)buffer1,0x0400); //Запи�?ем блок в б�?фер
   	//SD_Read_Block(sect,0x0400); //Считаем блок из б�?фера

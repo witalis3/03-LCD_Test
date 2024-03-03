@@ -48,9 +48,7 @@ DSTATUS disk_status (
   * @param  pdrv: Physical drive number (0..)
   * @retval DSTATUS: Operation status
   */
-DSTATUS disk_initialize (
-	BYTE pdrv				/* Physical drive nmuber to identify the drive */
-)
+DSTATUS disk_initialize (BYTE pdrv /* Physical drive nmuber to identify the drive */)
 {
   DSTATUS stat = RES_OK;
 
