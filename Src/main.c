@@ -16,24 +16,28 @@
   ******************************************************************************
   *
   * ToDo
+  *
   * ---------------- jest:
   * SPI4 interfejs do LCD
   * PE12 SCK zielony
   * PE14 MOSI fioletowy
   * OLED CS: PE10 LCD_CS żółty nie jest to CS dla SPI!
   * Half Duplex -> tylko MOSI
-  * -----------
+  * ----------------
   * RS232 na USART1
   * PB14 TxD
   * PB15 RxD
-  * ----------------------------------
-  * SPI2 - nowy interfejs do testowania z kartą SD (urok 88 - part 2)
-  * podłączona karta SD z modułu na barana (mini stykówka z goldpinów):
-  * SPI2 ------------------> gniazdo SD
-  * PB10  SCK zielony     -> PC12
-  * PC2_C MISO niebieski  -> PC8
-  * PC1   MOSI fioletowy  -> PD2
-  * PC11  CS żółty (CS_SD) niepotrzebna stykówka
+  * ----------------------------------------------------
+  * SPI2 - interfejs do testowania z kartą SD (urok 88):
+  * --------------------------------------
+  * podłączona karta SD z modułu na barana (mini stykówka z goldpinów na zewnątrz):
+  * SPI2  |----------------|-> gniazdo SD|
+  * PB10  |SCK zielony     -> PC12
+  * PC2_C |MISO niebieski  -> PC8
+  * PC1   |MOSI fioletowy  -> PD2
+  * --------------------------------------
+  * PC11  |CS żółty (CS_SD) niepotrzebna stykówka
+  * ----------------------------------------------------
   * LED zamiast na PC13 jest na PE3 (na schemacie modułu dioda oznaczona jako E3 BLUE_LED)
   *
   */
@@ -71,7 +75,9 @@
 /* Private variables ---------------------------------------------------------*/
 
 /* USER CODE BEGIN PV */
-volatile uint16_t Timer1=0;
+volatile uint16_t Timer1 = 0;
+uint8_t sect[512];
+//char buffer1[512] ="Selection ... The..."; //Буфер данных для записи/чтения -> tylko do testu
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -197,11 +203,17 @@ CPU_CACHE_Enable();
   //	HAL_TIMEx_PWMN_Start(&htim1,TIM_CHANNEL_2);
   //	__HAL_TIM_SetCompare(&htim1,TIM_CHANNEL_2,10);
   	LCD_Test();
-  	char str1[] = "hello urok 88";
+  	char str1[] = "hello urok 88\r\n";
   	HAL_UART_Transmit(&huart1,(uint8_t*)str1,strlen(str1),0x1000);
   	HAL_TIM_Base_Start_IT(&htim2);
   	SD_PowerOn();
   	sd_ini();
+  	// test zapisu i odczytu z SD:
+  	//SD_Write_Block((uint8_t*)buffer1,0x0400); //Запи�?ем блок в б�?фер
+  	//SD_Read_Block(sect,0x0400); //Считаем блок из б�?фера
+  	//for(i=0;i<512;i++) HAL_UART_Transmit(&huart1,sect+i,1,0x1000);
+  	//HAL_UART_Transmit(&huart1,(uint8_t*)"rn",2,0x1000);
+  	// koniec testu
 
   /* USER CODE END 2 */
 

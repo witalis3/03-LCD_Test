@@ -29,7 +29,49 @@ void SD_PowerOn(void)
   while(Timer1<2) //ждём 20 милисекунд, для того, чтобы напряжение стабилизировалось
     ;
 }
-
+//-----------------------------------------------
+uint8_t SD_Read_Block (uint8_t *buff, uint32_t lba)
+{
+  uint8_t result;
+  uint16_t cnt;
+  result=SD_cmd (CMD17, lba); //CMD17 даташит стр 50 и 96
+  if (result!=0x00) return 5; //Выйти, если результат не 0x00
+  SPI_Release();
+    cnt=0;
+    do{ //Ждем начала блока
+      result=SPI_ReceiveByte();
+      cnt++;
+    } while ( (result!=0xFE)&&(cnt<0xFFFF) );
+    if (cnt>=0xFFFF) return 5;
+    for (cnt=0;cnt<512;cnt++) buff[cnt]=SPI_ReceiveByte(); //получаем байты блока из шины в буфер
+    SPI_Release(); //Пропускаем контрольную сумму
+    SPI_Release();
+  return 0;
+}
+//-----------------------------------------------
+//-----------------------------------------------
+uint8_t SD_Write_Block (uint8_t *buff, uint32_t lba)
+{
+  uint8_t result;
+  uint16_t cnt;
+  result=SD_cmd(CMD24,lba); //CMD24 даташит стр 51 и 97-98
+  if (result!=0x00) return 6; //Выйти, если результат не 0x00
+  SPI_Release();
+  SPI_SendByte (0xFE); //Начало буфера
+  for (cnt=0;cnt<512;cnt++) SPI_SendByte(buff[cnt]); //Данные
+  SPI_Release(); //Пропустим котрольную сумму
+  SPI_Release();
+  result=SPI_ReceiveByte();
+  if ((result&0x05)!=0x05) return 6; //Выйти, если результат не 0x05 (Даташит стр 111)
+  cnt=0;
+  do { //Ждем окончания состояния BUSY
+    result=SPI_ReceiveByte();
+    cnt++;
+  } while ( (result!=0xFF)&&(cnt<0xFFFF) );
+  if (cnt>=0xFFFF) return 6;
+  return 0;
+}
+//-----------------------------------------------
 uint8_t sd_ini(void)
 {
 	uint8_t i, cmd;
@@ -86,7 +128,7 @@ uint8_t sd_ini(void)
 	    }
 	    else
 	    {
-	    	sprintf(str1,"Type SD: unknown");
+	    	sprintf(str1,"Type SD: unknown\r\n");
 	    	HAL_UART_Transmit(&huart1,(uint8_t*)str1,strlen(str1),0x1000);
 	      return 1;
 	    }
